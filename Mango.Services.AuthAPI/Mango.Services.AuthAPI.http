@@ -1,0 +1,33 @@
+@baseUrl = https://localhost:7002
+
+POST {{baseUrl}}/api/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "test@mail.ru",
+    "userName": "test",
+    "password": "78uiJK!"
+}
+
+###
+
+POST {{baseUrl}}/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "test",
+    "password": "78uiJK!"
+}
+
+###
+
+POST {{baseUrl}}/api/auth/assignRole
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "test",
+    "roleName": "reader"
+}

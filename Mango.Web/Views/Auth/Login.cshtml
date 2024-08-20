@@ -1,0 +1,35 @@
+﻿@model LoginRequestDto
+
+<form method="post">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>Login</h1>
+        </div>
+        <hr />
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+        <div class="row">
+            <div class="col-6 offset-3 pb-2">
+                <input asp-for="UserName" class="form-control" placeholder="UserName..." />
+                <span asp-validation-for="UserName" class="text-danger" />
+            </div>
+            <div class="col-6 offset-3 pb-2">
+                <input asp-for="Password" class="form-control" placeholder="Password..." type="password" />
+                <span asp-validation-for="Password" class="text-danger" />
+            </div>
+            <div class="col-6 offset-3 pb-2">
+                <button type="submit" class="form-control btn btn-primary" value="Submit">Login</button>
+            </div>
+        </div>
+    </div>
+</form>
