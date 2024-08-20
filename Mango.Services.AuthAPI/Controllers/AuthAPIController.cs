@@ -114,7 +114,7 @@ namespace Mango.Services.AuthAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Not found"
+                        Error = "Not Found"
                     };
                 }
 
@@ -124,7 +124,7 @@ namespace Mango.Services.AuthAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Invalid password"
+                        Error = "Invalid Password"
                     };
                 }
 
@@ -168,7 +168,7 @@ namespace Mango.Services.AuthAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Not found"
+                        Error = "Not Found"
                     };
                 }
 

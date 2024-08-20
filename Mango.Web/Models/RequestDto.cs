@@ -2,7 +2,8 @@
 {
     public class RequestDto
     {
-        public ApiType ApiType { get; set; } = ApiType.GET;
+        public MethodType Method { get; set; } = MethodType.GET;
+        public AuthorizationType Authorization { get; set; } = AuthorizationType.Bearer;
         public string Url { get; set; }
         public object Data { get; set; }
     }

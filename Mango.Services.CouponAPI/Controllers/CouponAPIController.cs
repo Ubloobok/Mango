@@ -9,6 +9,7 @@ namespace Mango.Services.CouponAPI.Controllers
 {
     [Route("api/coupons")]
     [ApiController]
+    [Authorize]
     public class CouponAPIController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -59,7 +60,7 @@ namespace Mango.Services.CouponAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Not found"
+                        Error = "Not Found"
                     };
                 }
 
@@ -91,7 +92,7 @@ namespace Mango.Services.CouponAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Not found"
+                        Error = "Not Found"
                     };
                 }
 
@@ -199,7 +200,7 @@ namespace Mango.Services.CouponAPI.Controllers
                     return new()
                     {
                         IsSuccess = false,
-                        Error = "Not found"
+                        Error = "Not Found"
                     };
                 }
 

@@ -1,6 +1,6 @@
 ﻿namespace Mango.Web.Models
 {
-    public enum ApiType
+    public enum MethodType
     {
         GET,
         POST,

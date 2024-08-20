@@ -22,7 +22,7 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<IEnumerable<CouponDto>>(new RequestDto
             {
-                ApiType = ApiType.GET,
+                Method = MethodType.GET,
                 Url = _configuration.CouponAPI + "/api/coupons"
             });
         }
@@ -31,7 +31,7 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<CouponDto>(new RequestDto
             {
-                ApiType = ApiType.GET,
+                Method = MethodType.GET,
                 Url = _configuration.CouponAPI + "/api/coupons/" + couponId
             });
         }
@@ -45,7 +45,7 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<CouponDto>(new RequestDto
             {
-                ApiType = ApiType.POST,
+                Method = MethodType.POST,
                 Url = _configuration.CouponAPI + "/api/coupons",
                 Data = coupon
             });
@@ -55,7 +55,7 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<CouponDto>(new RequestDto
             {
-                ApiType = ApiType.PUT,
+                Method = MethodType.PUT,
                 Url = _configuration.CouponAPI + "/api/coupons",
                 Data = coupon
             });
@@ -65,7 +65,7 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<CouponDto>(new RequestDto
             {
-                ApiType = ApiType.DELETE,
+                Method = MethodType.DELETE,
                 Url = _configuration.CouponAPI + "/api/coupons/" + couponId
             });
         }

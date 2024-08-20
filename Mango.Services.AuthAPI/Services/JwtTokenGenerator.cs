@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Mango.Services.AuthAPI.Services
@@ -18,9 +19,6 @@ namespace Mango.Services.AuthAPI.Services
 
         public string GenerateToken(IdentityUser user, string roleName)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
-
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id),
@@ -29,16 +27,21 @@ namespace Mango.Services.AuthAPI.Services
                 new(ClaimTypes.Role, roleName)
             };
 
+            var privateKey = RSA.Create();
+            privateKey.ImportFromPem(_jwtOptions.PrivateKey);
+            var credentials = new SigningCredentials(new RsaSecurityKey(privateKey), SecurityAlgorithms.RsaSha256);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Audience = _jwtOptions.Audience,
                 Issuer = _jwtOptions.Issuer,
                 Subject = new ClaimsIdentity(claims),
-                // or use Claims
+                // or use Claims.
                 Expires = DateTime.Now.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = credentials
             };
 
+            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);

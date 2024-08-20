@@ -22,7 +22,8 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<UserDto>(new RequestDto
             {
-                ApiType = ApiType.POST,
+                Method = MethodType.POST,
+                Authorization = AuthorizationType.None,
                 Url = _configuration.AuthAPI + "/api/auth/register",
                 Data = requestDto
             });
@@ -32,7 +33,8 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<LoginResponseDto>(new RequestDto
             {
-                ApiType = ApiType.POST,
+                Method = MethodType.POST,
+                Authorization = AuthorizationType.None,
                 Url = _configuration.AuthAPI + "/api/auth/login",
                 Data = requestDto
             });
@@ -42,7 +44,8 @@ namespace Mango.Web.Services
         {
             return await _baseService.SendAsync<UserDto>(new RequestDto
             {
-                ApiType = ApiType.POST,
+                Method = MethodType.POST,
+                Authorization = AuthorizationType.None,
                 Url = _configuration.AuthAPI + "/api/auth/assignRole",
                 Data = requestDto
             });

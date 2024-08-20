@@ -3,10 +3,13 @@ using Mango.Services.CouponAPI.Data;
 using Mango.Services.CouponAPI.Handlers;
 using Mango.Services.CouponAPI.Models;
 using Mango.Services.CouponAPI.Models.Dto;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +30,51 @@ builder.Services.AddTransient<IHandler<GetFooArgs, Foo>, GetFooHandler>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(name: "Bearer", securityScheme: new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter the `Bearer Token`",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            },
+            new string[]{ }
+        }
+    });
+});
+
+var tokenSection = builder.Configuration.GetRequiredSection("TokenValidationParameters");
+var publicKey = RSA.Create();
+publicKey.ImportFromPem(tokenSection["IssuerSigningKey"]);
+
+builder.Services.AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        //IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Long enough secret, because of IDX10653.")),
+        IssuerSigningKey = new RsaSecurityKey(publicKey),
+        ValidateIssuer = true,
+        ValidIssuer = tokenSection["ValidIssuer"],
+        ValidateAudience = true,
+        ValidAudience = tokenSection["ValidAudience"]
+    });
 
 var app = builder.Build();
 
@@ -39,7 +86,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

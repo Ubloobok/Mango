@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetRequiredSection("JwtOptions"));
 builder.Services.AddTransient<JwtOptions>(provider => provider.GetRequiredService<IOptions<JwtOptions>>().Value);
 builder.Services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
 
