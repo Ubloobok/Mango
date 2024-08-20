@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -81,25 +82,25 @@ namespace Mango.Web.Controllers
                 return View(request);
             }
 
-            await SignInUser(response.Result.Token);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(response.Result.Token);
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+            identity.AddClaims(jwt.Claims);
+            identity.AddClaim(new Claim(ClaimTypes.Name, response.Result.User.UserName));
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
             _tokenProvider.SetToken(response.Result.Token);
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            return View();
-        }
-
-        private async Task SignInUser(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaims(jwt.Claims);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            await HttpContext.SignOutAsync();
+            _tokenProvider.ClearToken();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }
 }

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container. 
-builder.Services.Configure<CouponService.Configuration>(builder.Configuration.GetSection("Coupon"));
+builder.Services.Configure<CouponService.Configuration>(builder.Configuration.GetRequiredSection("Coupon"));
 builder.Services.AddTransient(provider => provider.GetRequiredService<IOptions<CouponService.Configuration>>().Value);
-builder.Services.Configure<AuthService.Configuration>(builder.Configuration.GetSection("Auth"));
+builder.Services.Configure<AuthService.Configuration>(builder.Configuration.GetRequiredSection("Auth"));
 builder.Services.AddTransient(provider => provider.GetRequiredService<IOptions<AuthService.Configuration>>().Value);
 
 builder.Services.AddHttpContextAccessor();
