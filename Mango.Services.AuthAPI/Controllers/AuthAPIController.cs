@@ -3,6 +3,7 @@ using Mango.Services.AuthAPI.Models.Dto;
 using Mango.Services.AuthAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Mango.Services.AuthAPI.Controllers
@@ -127,6 +128,9 @@ namespace Mango.Services.AuthAPI.Controllers
                     };
                 }
 
+                var roles = await _userManager.GetRolesAsync(user);
+                string roleName = roles.FirstOrDefault();
+
                 return new()
                 {
                     IsSuccess = true,
@@ -138,7 +142,7 @@ namespace Mango.Services.AuthAPI.Controllers
                             UserName = user.UserName,
                             Email = user.Email
                         },
-                        Token = _jwtTokenGenerator.GenerateToken(user)
+                        Token = _jwtTokenGenerator.GenerateToken(user, roleName)
                     }
                 };
             }

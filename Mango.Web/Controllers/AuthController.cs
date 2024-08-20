@@ -44,9 +44,9 @@ namespace Mango.Web.Controllers
             }
 
             var response = await _authService.RegisterAsync(request);
-            if (!response.IsSuccess)
+            if (!response.IsSuccess || response.Result == null)
             {
-                TempData["Error"] = response.Error;
+                TempData["Error"] = response.Error ?? "Invalid Result";
                 var roles = new List<SelectListItem>
                 {
                     new() { Text = UserRole.Customer, Value = UserRole.Customer },
@@ -76,17 +76,30 @@ namespace Mango.Web.Controllers
             }
 
             var response = await _authService.LoginAsync(request);
-            if (!response.IsSuccess)
+            if (!response.IsSuccess || response.Result == null)
             {
-                TempData["Error"] = response.Error;
+                TempData["Error"] = response.Error ?? "Invalid Result";
                 return View(request);
             }
 
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(response.Result.Token);
+
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaims(jwt.Claims);
-            identity.AddClaim(new Claim(ClaimTypes.Name, response.Result.User.UserName));
+
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email,
+                jwt.Claims.First(_ => _.Type == JwtRegisteredClaimNames.Email).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub,
+                jwt.Claims.First(_ => _.Type == JwtRegisteredClaimNames.Sub).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name,
+                jwt.Claims.First(_ => _.Type == JwtRegisteredClaimNames.Name).Value));
+            // ClaimTypes.Name used to display User.Identity.Name:
+            identity.AddClaim(new Claim(ClaimTypes.Name,
+                jwt.Claims.First(_ => _.Type == JwtRegisteredClaimNames.Name).Value));
+            // ClaimTypes.Role used to manage Authorization Access:
+            identity.AddClaim(new Claim(ClaimTypes.Role,
+                jwt.Claims.First(_ => _.Type == "role").Value));
+
             var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);

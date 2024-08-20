@@ -13,12 +13,14 @@ namespace Mango.Web.Controllers
             _couponService = couponService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var response = await _couponService.GetCouponsAsync();
-            if (!response.IsSuccess)
+            if (!response.IsSuccess || response.Result == null)
             {
-                return View();
+                TempData["Error"] = response.Error ?? "Invalid Result";
+                return View(Enumerable.Empty<CouponDto>());
             }
 
             var coupons = response.Result.ToList();
@@ -26,7 +28,8 @@ namespace Mango.Web.Controllers
             return View(coupons);
         }
 
-        public async Task<IActionResult> Create()
+        [HttpGet]
+        public IActionResult Create()
         {
             return View();
         }
@@ -69,20 +72,18 @@ namespace Mango.Web.Controllers
             }
 
             var response = await _couponService.UpdateCouponAsync(coupon);
-            if (!response.IsSuccess)
+            if (!response.IsSuccess || response.Result == null)
             {
-                TempData["Error"] = response.Error;
+                TempData["Error"] = response.Error ?? "Invalid Result";
                 return View(coupon);
             }
-            else
-            {
-                // Clear model state to show updated fields.
-                ModelState.Clear();
-                TempData["Success"] = "Saved";
-                return View(response.Result);
-                // We don't need redirection as we Clear model state.
-                //return RedirectToAction(nameof(Edit), coupon.CouponId);
-            }
+
+            // Clear model state to show updated fields.
+            ModelState.Clear();
+            TempData["Success"] = "Saved";
+            return View(response.Result);
+            // We don't need redirection as we Clear model state.
+            //return RedirectToAction(nameof(Edit), coupon.CouponId);
         }
 
         [HttpPost]
@@ -91,7 +92,7 @@ namespace Mango.Web.Controllers
             var response = await _couponService.DeleteCouponAsync(id);
             if (!response.IsSuccess)
             {
-                TempData["Error"] = response.Error;
+                TempData["Error"] = response.Error ?? "Invalid Result";
             }
 
             return RedirectToAction(nameof(Index));
